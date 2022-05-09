@@ -1,0 +1,47 @@
+ - name: NodejsappDeployment
+    hosts: slave
+    become: true
+    become_user: root
+    gather_facts: true
+    tasks:
+      - name: "Update Repository cache"
+        apt:
+          update_cache: yes
+      - name: "Upgrade installed packages"
+        apt:
+          upgrade: dist
+      - name: "Update all packages to their latest version"
+        apt:
+          name: "*"
+          state: latest
+      - name: "Install NodeJs"
+        apt:
+          name: nodejs
+          state: present
+      - name: "Install npm"
+        apt:
+          name: npm
+          state: present
+      - name: "MongoDB"
+        apt:
+          name: mongodb
+          state: present
+      - name: "Clone git repository for the application"
+        ansible.builtin.git:
+          repo: https://github.com/deepaalip/NodeJs-API.git
+          dest: /opt
+          version: master
+        environment:
+          GIT_TERMINAL_PROMPT: 0
+      - name: "Install the project dependincies by npm"
+        shell: "npm install"
+        args:
+          chdir: "/opt/"
+      - name: "Starting the Node application"
+        shell: "nohup npm start &"
+        args:
+          chdir: "/opt/"
+
+
+
+
